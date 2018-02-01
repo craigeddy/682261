@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Google.Authenticator;
 
@@ -19,7 +13,7 @@ namespace GoogleAuthenticator
         {
             InitializeComponent();
             TwoFactorAuthenticator tfA = new TwoFactorAuthenticator();
-            var setupCode = tfA.GenerateSetupCode("FACTSInfo", "Craig Eddy", Guid.NewGuid().ToString("N"), 
+            var setupCode = tfA.GenerateSetupCode("FACTSInfo", "Craig Eddy", "afe84d07aaea4bd299282c3b13a653ee", 
                 pictureBox1.Width, pictureBox1.Height);
             WebClient wc = new WebClient();
             MemoryStream ms = new MemoryStream(wc.DownloadData(setupCode.QrCodeSetupImageUrl));
@@ -31,10 +25,10 @@ namespace GoogleAuthenticator
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ValidateClicked(object sender, EventArgs e)
         {
             TwoFactorAuthenticator tfA = new TwoFactorAuthenticator();
-            var result = tfA.ValidateTwoFactorPIN("f68f1fe894d548a1bbc66165c46e61eb", this.txtCode.Text);
+            var result = tfA.ValidateTwoFactorPIN("afe84d07aaea4bd299282c3b13a653ee", this.txtCode.Text);
 
             MessageBox.Show(result ? "Validated!" : "Incorrect", "Result");
         }
