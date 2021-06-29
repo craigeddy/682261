@@ -12,22 +12,26 @@ namespace GoogleAuthenticator
         public Form1()
         {
             InitializeComponent();
-            TwoFactorAuthenticator tfA = new TwoFactorAuthenticator();
-            var setupCode = tfA.GenerateSetupCode("FACTSInfo", "Craig Eddy", "afe84d07aaea4bd299282c3b13a653ee", 
-                pictureBox1.Width, pictureBox1.Height);
-            WebClient wc = new WebClient();
-            MemoryStream ms = new MemoryStream(wc.DownloadData(setupCode.QrCodeSetupImageUrl));
-            this.pictureBox1.Image = Image.FromStream(ms);
+            var tfA = new TwoFactorAuthenticator();
+            var setupCode = tfA.GenerateSetupCode(
+                "FACTSInfo", 
+                "eddycr@state.gov", 
+                "afe84d07aaea4bd299282c3b13a653ee", // persistent, per-user cryptographic key (not shared w/ user)
+                false);
 
-            this.txtSetupCode.Text = "Account: " + setupCode.Account + System.Environment.NewLine +
-                                     "Secret Key: " + setupCode.AccountSecretKey + System.Environment.NewLine +
-                                     "Encoded Key: " + setupCode.ManualEntryKey;
+            using (var ms = new MemoryStream(
+                Convert.FromBase64String(setupCode.QrCodeSetupImageUrl.Replace("data:image/png;base64,", ""))))
+            {
+                pictureBox1.Image = Image.FromStream(ms);
+            }
 
+            // the QR Code and the setupCode.ManualEntryKey are shared with the user so that they can set up Authenticator
+            txtSetupCode.Text = $@"Account: {setupCode.Account}{Environment.NewLine}Encoded Key: {setupCode.ManualEntryKey}";
         }
 
         private void ValidateClicked(object sender, EventArgs e)
         {
-            TwoFactorAuthenticator tfA = new TwoFactorAuthenticator();
+            var tfA = new TwoFactorAuthenticator();
             var result = tfA.ValidateTwoFactorPIN("afe84d07aaea4bd299282c3b13a653ee", this.txtCode.Text);
 
             MessageBox.Show(result ? "Validated!" : "Incorrect", "Result");
