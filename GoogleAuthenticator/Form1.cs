@@ -9,6 +9,8 @@ namespace GoogleAuthenticator
 {
     public partial class Form1 : Form
     {
+        private const string AccountSecretKey = "afe84d07aaea4bd299282c3b13a653ee";
+
         public Form1()
         {
             InitializeComponent();
@@ -16,7 +18,7 @@ namespace GoogleAuthenticator
             var setupCode = tfA.GenerateSetupCode(
                 "FACTSInfo", 
                 "eddycr@state.gov", 
-                "afe84d07aaea4bd299282c3b13a653ee", // persistent, per-user cryptographic key (not shared w/ user)
+                AccountSecretKey, // persistent, per-user cryptographic key (not shared w/ user)
                 false);
 
             using (var ms = new MemoryStream(
@@ -32,7 +34,7 @@ namespace GoogleAuthenticator
         private void ValidateClicked(object sender, EventArgs e)
         {
             var tfA = new TwoFactorAuthenticator();
-            var result = tfA.ValidateTwoFactorPIN("afe84d07aaea4bd299282c3b13a653ee", this.txtCode.Text);
+            var result = tfA.ValidateTwoFactorPIN(AccountSecretKey, this.txtCode.Text);
 
             MessageBox.Show(result ? "Validated!" : "Incorrect", "Result");
         }
